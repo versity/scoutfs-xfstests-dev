@@ -256,6 +256,7 @@ case "$HOSTOS" in
         export MKFS_CIFS_PROG="false"
         export MKFS_OVERLAY_PROG="false"
         export MKFS_REISER4_PROG="`set_prog_path mkfs.reiser4`"
+        export SCOUTFS_PROG="`set_prog_path scoutfs`"
         ;;
 esac
 

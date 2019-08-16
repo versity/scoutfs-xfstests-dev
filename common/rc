@@ -152,6 +152,9 @@ case "$FSTYP" in
     reiser4)
 	 [ "$MKFS_REISER4_PROG" = "" ] && _fatal "mkfs.reiser4 not found"
 	 ;;
+    scoutfs)
+	 [ "$SCOUTFS_PROG" = "" ] && _fatal "scoutfs not found"
+	 ;;
 esac
 
 # make sure we have a standard umask
@@ -717,6 +720,9 @@ _test_mkfs()
     ext2|ext3|ext4)
 	$MKFS_PROG -t $FSTYP -- -F $MKFS_OPTIONS $* $TEST_DEV
 	;;
+    scoutfs)
+	$SCOUTFS_PROG mkfs $MKFS_OPTIONS $* $TEST_DEV
+	;;
     *)
 	yes | $MKFS_PROG -t $FSTYP -- $MKFS_OPTIONS $* $TEST_DEV
 	;;
@@ -741,6 +747,9 @@ _mkfs_dev()
     ext2|ext3|ext4)
 	$MKFS_PROG -t $FSTYP -- -F $MKFS_OPTIONS $* \
 		2>$tmp_dir.mkfserr 1>$tmp_dir.mkfsstd
+	;;
+    scoutfs)
+        $SCOUTFS_PROG $MKFS_OPTIONS $* 2>$tmp_dir.mkfserr 1>$tmp_dir.mkfsstd
 	;;
 
     *)
@@ -813,6 +822,9 @@ _scratch_mkfs()
 	;;
     f2fs)
         $MKFS_F2FS_PROG $MKFS_OPTIONS $* $SCRATCH_DEV > /dev/null
+	;;
+    scoutfs)
+	$SCOUTFS_PROG mkfs $MKFS_OPTIONS $* $SCRATCH_DEV
 	;;
     *)
 	yes | $MKFS_PROG -t $FSTYP -- $MKFS_OPTIONS $* $SCRATCH_DEV
@@ -2670,6 +2682,9 @@ _check_test_fs()
     tmpfs)
 	# no way to check consistency for tmpfs
 	;;
+    scoutfs)
+	# currently not checking
+	;;
     *)
 	_check_generic_filesystem $TEST_DEV
 	;;
@@ -2710,6 +2725,9 @@ _check_scratch_fs()
 	;;
     tmpfs)
 	# no way to check consistency for tmpfs
+	;;
+    scoutfs)
+	# currently not checking
 	;;
     *)
 	_check_generic_filesystem $device

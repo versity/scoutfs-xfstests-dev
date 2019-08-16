@@ -254,7 +254,7 @@ _sort_getfattr_output()
 }
 
 # set maximum total attr space based on fs type
-if [ "$FSTYP" == "xfs" -o "$FSTYP" == "udf" ]; then
+if [ "$FSTYP" == "xfs" -o "$FSTYP" == "udf" -o "$FSTYP" == "scoutfs" ]; then
 	MAX_ATTRS=1000
 else # Assume max ~1 block of attrs
 	BLOCK_SIZE=`get_block_size $TEST_DIR`
@@ -265,7 +265,7 @@ fi
 export MAX_ATTRS
 
 # Set max attr value size based on fs type
-if [ "$FSTYP" == "xfs" -o "$FSTYP" == "udf" -o "$FSTYP" == "btrfs" ]; then
+if [ "$FSTYP" == "xfs" -o "$FSTYP" == "udf" -o "$FSTYP" == "btrfs"  -o "$FSTYP" == "scoutfs" ]; then
 	MAX_ATTRVAL_SIZE=64
 else # Assume max ~1 block of attrs
 	BLOCK_SIZE=`get_block_size $TEST_DIR`
