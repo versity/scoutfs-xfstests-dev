@@ -62,7 +62,12 @@ _mount_flakey()
 {
 	_scratch_options mount
 
-	mount -t $FSTYP $SCRATCH_OPTIONS $MOUNT_OPTIONS $FLAKEY_DEV $SCRATCH_MNT
+	if [ "$FSTYP" == "scoutfs" ]; then
+	    mount -t $FSTYP $SCRATCH_OPTIONS $SCRATCH_MOUNT_OPTIONS $SCOUTFS_SCRATCH_MOUNT_OPTIONS $FLAKEY_DEV $SCRATCH_MNT
+	    return
+	fi
+
+	mount -t $FSTYP $SCRATCH_OPTIONS $SCRATCH_MOUNT_OPTIONS $FLAKEY_DEV $SCRATCH_MNT
 }
 
 _unmount_flakey()

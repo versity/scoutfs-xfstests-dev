@@ -264,5 +264,27 @@ _getfattr()
 	return ${PIPESTATUS[0]}
 }
 
+# set maximum total attr space based on fs type
+if [ "$FSTYP" == "xfs" -o "$FSTYP" == "udf" -o "$FSTYP" == "scoutfs" ]; then
+	MAX_ATTRS=1000
+else # Assume max ~1 block of attrs
+	BLOCK_SIZE=`get_block_size $TEST_DIR`
+	# user.attribute_XXX="value.XXX" is about 32 bytes; leave some overhead
+	let MAX_ATTRS=$BLOCK_SIZE/40
+fi
+
+export MAX_ATTRS
+
+# Set max attr value size based on fs type
+if [ "$FSTYP" == "xfs" -o "$FSTYP" == "udf" -o "$FSTYP" == "btrfs"  -o "$FSTYP" == "scoutfs" ]; then
+	MAX_ATTRVAL_SIZE=64
+else # Assume max ~1 block of attrs
+	BLOCK_SIZE=`get_block_size $TEST_DIR`
+	# leave a little overhead
+	let MAX_ATTRVAL_SIZE=$BLOCK_SIZE-256
+fi
+
+export MAX_ATTRVAL_SIZE
+
 # make sure this script returns success
 /bin/true

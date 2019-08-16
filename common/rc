@@ -143,6 +143,9 @@ case "$FSTYP" in
     ubifs)
 	[ "$UBIUPDATEVOL_PROG" = "" ] && _fatal "ubiupdatevol not found"
 	;;
+    scoutfs)
+	 [ "$SCOUTFS_PROG" = "" ] && _fatal "scoutfs not found"
+	 ;;
 esac
 
 if [ ! -z "$REPORT_LIST" ]; then
@@ -293,9 +296,37 @@ _common_dev_mount_options()
 	echo $MOUNT_OPTIONS $SELINUX_MOUNT_OPTIONS $*
 }
 
+_overlay_basic_mount_options()
+{
+	echo "-o lowerdir=$1/$OVERLAY_LOWER_DIR,upperdir=$1/$OVERLAY_UPPER_DIR,workdir=$1/$OVERLAY_WORK_DIR"
+}
+
+_overlay_mount_options()
+{
+	echo `_common_dev_mount_options` \
+	     `_overlay_basic_mount_options $1` \
+	     $OVERLAY_MOUNT_OPTIONS
+}
+
+_scoutfs_mount_options()
+{
+	echo "$SCOUTFS_SCRATCH_MOUNT_OPTIONS $*" \
+	     "$SCRATCH_DEV" \
+	     "$SCRATCH_MNT"
+}
+
 _scratch_mount_options()
 {
 	_scratch_options mount
+
+	if [ "$FSTYP" == "overlay" ]; then
+		echo `_overlay_mount_options $SCRATCH_DEV`
+		return 0
+	fi
+	if [ "$FSTYP" == "scoutfs" ]; then
+		echo `_scoutfs_mount_options $*`
+		return 0
+	fi
 
 	echo `_common_dev_mount_options $*` $SCRATCH_OPTIONS \
 					$SCRATCH_DEV $SCRATCH_MNT
@@ -755,6 +786,9 @@ _test_mkfs()
     ext2|ext3|ext4)
 	$MKFS_PROG -t $FSTYP -- -F $MKFS_OPTIONS $* $TEST_DEV
 	;;
+    scoutfs)
+	$SCOUTFS_PROG mkfs $MKFS_OPTIONS $* $TEST_DEV
+	;;
     *)
 	yes | $MKFS_PROG -t $FSTYP -- $MKFS_OPTIONS $* $TEST_DEV
 	;;
@@ -794,6 +828,10 @@ _mkfs_dev()
 	$MKFS_PROG -t $FSTYP -- -f $MKFS_OPTIONS $* \
 		2>$tmp.mkfserr 1>$tmp.mkfsstd
 	;;
+    scoutfs)
+        $SCOUTFS_PROG mkfs $MKFS_OPTIONS $* 2>$tmp_dir.mkfserr 1>$tmp_dir.mkfsstd
+	;;
+
     *)
 	yes | $MKFS_PROG -t $FSTYP -- $MKFS_OPTIONS $* \
 		2>$tmp.mkfserr 1>$tmp.mkfsstd
@@ -890,6 +928,10 @@ _scratch_mkfs()
 	ocfs2)
 		mkfs_cmd="yes | $MKFS_PROG -t $FSTYP --"
 		mkfs_filter="grep -v -e ^mkfs\.ocfs2"
+		;;
+	scoutfs)
+		mkfs_cmd="$SCOUTFS_PROG mkfs $MKFS_OPTIONS $MKFS_SCRATCH_OPTIONS $* $SCRATCH_META_DEV"
+		mkfs_filter="cat"
 		;;
 	*)
 		mkfs_cmd="yes | $MKFS_PROG -t $FSTYP --"
@@ -3250,6 +3292,9 @@ _check_test_fs()
     ubifs)
 	# there is no fsck program for ubifs yet
 	;;
+    scoutfs)
+	# currently not checking
+	;;
     *)
 	_check_generic_filesystem $TEST_DEV
 	;;
@@ -3307,6 +3352,9 @@ _check_scratch_fs()
 	;;
     ubifs)
 	# there is no fsck program for ubifs yet
+	;;
+    scoutfs)
+	# currently not checking
 	;;
     *)
 	_check_generic_filesystem $device
