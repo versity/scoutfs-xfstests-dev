@@ -28,6 +28,7 @@ fi
 
 _init_flakey()
 {
+	_scratch_mkfs > /dev/null
 	local BLK_DEV_SIZE=`blockdev --getsz $SCRATCH_DEV`
 	FLAKEY_DEV=/dev/mapper/flakey-test
 	FLAKEY_TABLE="0 $BLK_DEV_SIZE flakey $SCRATCH_DEV 0 180 0"
@@ -40,7 +41,12 @@ _init_flakey()
 _mount_flakey()
 {
 	_scratch_options mount
-	mount -t $FSTYP $SCRATCH_OPTIONS $MOUNT_OPTIONS $FLAKEY_DEV $SCRATCH_MNT
+	if [ "$FSTYP" == "scoutfs" ]; then
+	    mount -t $FSTYP $SCRATCH_OPTIONS $SCOUTFS_SCRATCH_MOUNT_OPTIONS $FLAKEY_DEV $SCRATCH_MNT
+	    return
+	fi
+
+	mount -t $FSTYP $SCRATCH_OPTIONS $SCRATCH_MOUNT_OPTIONS $FLAKEY_DEV $SCRATCH_MNT
 }
 
 _unmount_flakey()

@@ -257,12 +257,23 @@ _overlay_mount_options()
 	     $OVERLAY_MOUNT_OPTIONS
 }
 
+_scoutfs_mount_options()
+{
+	echo "$SCOUTFS_SCRATCH_MOUNT_OPTIONS $*" \
+	     "$SCRATCH_DEV" \
+	     "$SCRATCH_MNT"
+}
+
 _scratch_mount_options()
 {
 	_scratch_options mount
 
 	if [ "$FSTYP" == "overlay" ]; then
 		echo `_overlay_mount_options $SCRATCH_DEV`
+		return 0
+	fi
+	if [ "$FSTYP" == "scoutfs" ]; then
+		echo `_scoutfs_mount_options $*`
 		return 0
 	fi
 	echo `_common_dev_mount_options $*` $SCRATCH_OPTIONS \
@@ -824,7 +835,7 @@ _scratch_mkfs()
         $MKFS_F2FS_PROG $MKFS_OPTIONS $* $SCRATCH_DEV > /dev/null
 	;;
     scoutfs)
-	$SCOUTFS_PROG mkfs $MKFS_OPTIONS $* $SCRATCH_DEV
+	$SCOUTFS_PROG mkfs $MKFS_OPTIONS $* $SCRATCH_META_DEV $SCRATCH_DEV
 	;;
     *)
 	yes | $MKFS_PROG -t $FSTYP -- $MKFS_OPTIONS $* $SCRATCH_DEV
