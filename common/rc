@@ -732,7 +732,7 @@ _test_mkfs()
 	$MKFS_PROG -t $FSTYP -- -F $MKFS_OPTIONS $* $TEST_DEV
 	;;
     scoutfs)
-	$SCOUTFS_PROG mkfs $MKFS_OPTIONS $* $TEST_DEV
+	$SCOUTFS_PROG mkfs -f $MKFS_OPTIONS $* $TEST_DEV
 	;;
     *)
 	yes | $MKFS_PROG -t $FSTYP -- $MKFS_OPTIONS $* $TEST_DEV
@@ -760,7 +760,7 @@ _mkfs_dev()
 		2>$tmp_dir.mkfserr 1>$tmp_dir.mkfsstd
 	;;
     scoutfs)
-        $SCOUTFS_PROG $MKFS_OPTIONS $* 2>$tmp_dir.mkfserr 1>$tmp_dir.mkfsstd
+        $SCOUTFS_PROG mkfs -f $MKFS_OPTIONS $* 2>$tmp_dir.mkfserr 1>$tmp_dir.mkfsstd
 	;;
 
     *)
@@ -835,7 +835,7 @@ _scratch_mkfs()
         $MKFS_F2FS_PROG $MKFS_OPTIONS $* $SCRATCH_DEV > /dev/null
 	;;
     scoutfs)
-	$SCOUTFS_PROG mkfs $MKFS_OPTIONS $* $SCRATCH_META_DEV $SCRATCH_DEV
+	$SCOUTFS_PROG mkfs -f $MKFS_OPTIONS $* $SCRATCH_META_DEV $SCRATCH_DEV
 	;;
     *)
 	yes | $MKFS_PROG -t $FSTYP -- $MKFS_OPTIONS $* $SCRATCH_DEV
