@@ -47,7 +47,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
 
 getfattr()
 {
-    $GETFATTR_PROG --absolute-names -dh $@ 2>&1 | _filter_scratch
+    $GETFATTR_PROG --absolute-names -dh $@ 2>&1 | _filter_scratch | sed 's/=""$//'
 }
 
 setfattr()
