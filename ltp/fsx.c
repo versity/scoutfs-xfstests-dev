@@ -2429,6 +2429,7 @@ out_error:
 	return -1;
 }
 #else
+int
 aio_rw(int rw, int fd, char *buf, unsigned len, unsigned offset)
 {
 	fprintf(stderr, "io_rw: need AIO support!\n");
