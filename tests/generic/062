@@ -185,7 +185,8 @@ _create_test_bed
 _extend_test_bed
 
 echo "*** restore everything"
-setfattr -h --restore=$tmp.backup1
+setfattr -h --restore=$tmp.backup1 2>&1 | sed -e '/restore=file is unsafe without option -P/d'
+
 _backup $tmp.backup2
 
 echo "AFTER RESTORE" >>$seqres.full
